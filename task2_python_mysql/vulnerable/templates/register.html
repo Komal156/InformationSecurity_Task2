@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrap">
+<form action="{{ url_for('register') }}" method="POST" id="register-form" class="auth-form">
+  <h1>Create account</h1>
+  <p class="subtitle">Join BookNest to save reviews and more</p>
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+  <label>Username <input type="text" name="username" required></label>
+  <label>
+    Email <input type="email" name="email" id="email" required>
+    <span id="email-status" class="email-status"></span>
+  </label>
+  <label>Password <input type="password" name="password" required></label>
+  <button type="submit">Create Account</button>
+  <p class="footnote">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+</form>
+</div>
+
+<script>
+  // Live "is this email already registered?" check -> calls the
+  // (vulnerable) /api/check-email endpoint.
+  const emailInput = document.getElementById('email');
+  const status = document.getElementById('email-status');
+  let t;
+  emailInput.addEventListener('input', () => {
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      if (!emailInput.value) { status.textContent = ''; return; }
+      try {
+        const r = await fetch('/api/check-email?email=' + encodeURIComponent(emailInput.value));
+        const j = await r.json();
+        status.textContent = j.status === 'taken' ? 'Email already registered'
+          : j.status === 'available' ? 'Email available'
+          : 'Error checking email';
+      } catch (e) {
+        status.textContent = 'Error checking email';
+      }
+    }, 400);
+  });
+</script>
+{% endblock %}

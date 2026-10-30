@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or 'BookNest' }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-vulnerable">
+  <div class="mode-banner mode-vulnerable">
+    <span class="mode-banner-icon">⚠</span>VULNERABLE VERSION — for authorized local testing / coursework only
+  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="{{ url_for('home') }}" class="brand">
+        <span class="brand-icon">📚</span><span class="brand-text">BookNest</span>
+      </a>
+      <form class="searchbar" action="{{ url_for('search') }}" method="GET">
+        <input type="text" name="q" placeholder="Search by title or author..." value="{{ q or '' }}">
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </form>
+      <nav>
+        {% if g.logged_in %}
+          <span class="hi">Hi, {{ g.username }}</span>
+          <a href="{{ url_for('profile') }}">Profile</a>
+          <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Login</a>
+          <a href="{{ url_for('register') }}" class="btn-primary-sm">Register</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  <div id="quick-note" class="quick-note"></div>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    📚 BookNest — a demo bookstore built for an Information Security coursework assignment.
+  </footer>
+  <script src="{{ url_for('static', filename='js/quicknote.js') }}"></script>
+</body>
+</html>

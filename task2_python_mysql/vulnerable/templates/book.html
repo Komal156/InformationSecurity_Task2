@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="book-detail">
+  <div class="cover cover-{{ book.id % 6 }} cover-lg">
+    <span class="cover-initial">{{ book.title[0] }}</span>
+  </div>
+  <div class="book-info">
+    <h1>{{ book.title }}</h1>
+    <p class="author">by {{ book.author }}</p>
+    <p class="price-tag">${{ "%.2f"|format(book.price) }}</p>
+    <p class="desc">{{ book.description }}</p>
+  </div>
+</div>
+
+<section class="reviews-section">
+  <h2>Reviews <span class="count">({{ reviews|length }})</span></h2>
+  {% if reviews|length == 0 %}
+    <p class="empty">No reviews yet — be the first to write one.</p>
+  {% endif %}
+  <div class="review-list">
+  {% for r in reviews %}
+    <div class="review">
+      <div class="review-avatar">{{ r.username[0]|upper }}</div>
+      <div class="review-body">
+        <strong>{{ r.username }}</strong>
+        <!-- VULNERABLE: comment rendered with |safe -> stored XSS -->
+        <span>{{ r.comment|safe }}</span>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+
+  {% if g.logged_in %}
+  <form action="{{ url_for('submit_review', book_id=book.id) }}" method="POST" class="review-form">
+    <textarea name="comment" placeholder="Share your thoughts about this book..." required></textarea>
+    <button type="submit" class="btn-primary">Submit Review</button>
+  </form>
+  {% else %}
+  <p class="login-hint"><a href="{{ url_for('login') }}">Log in</a> to leave a review.</p>
+  {% endif %}
+</section>
+{% endblock %}

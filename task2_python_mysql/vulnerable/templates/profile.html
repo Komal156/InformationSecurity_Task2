@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="section-title">My Profile</h2>
+<div class="profile-card">
+  <div class="row"><span class="label">Username</span><span class="value">{{ user.username }}</span></div>
+  <div class="row"><span class="label">Email</span><span class="value">{{ user.email }}</span></div>
+</div>
+
+<div class="auth-wrap" style="padding-top:0;">
+<!-- VULNERABLE: state-changing action via GET, no CSRF token -->
+<form action="{{ url_for('update_email') }}" method="GET" class="auth-form">
+  <h1 style="font-size:18px;">Update Email</h1>
+  <label>New email <input type="email" name="email" required></label>
+  <button type="submit">Update Email</button>
+</form>
+</div>
+{% endblock %}
